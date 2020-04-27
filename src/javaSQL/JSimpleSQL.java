@@ -2,10 +2,13 @@ package javaSQL;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class JSimpleSQL {
 
@@ -22,6 +25,14 @@ public class JSimpleSQL {
 	static String[] columns = new String[] { "", "", "", "", "NOT NULL", "", "", "", "", "", "" };
 	// 0.Name, 1.Type, 2.Type Length/Values, 3.Collation, 4.Null, 5.Default,
 	// 6.Comments, 7.Extra-2(AutoIncrement), 8.Attributes(Unsigned)
+	static ArrayList<String> arrayData = new ArrayList<>();
+	static ArrayList<String> arrayTable = new ArrayList<>();
+	static ArrayList<String> arrayFrom = new ArrayList<>();
+	static ArrayList<String> arrayWhere = new ArrayList<>();
+	static ArrayList<String> arrayBy = new ArrayList<>();
+	static ArrayList<String> arrayPrep = new ArrayList<>();
+	static String arrayAddData;
+	static String arrayAddColumn;
 
 	protected static void hostname(String HName) {
 		HostName = HName;
@@ -353,6 +364,7 @@ public class JSimpleSQL {
 		}
 
 		PrepString += ";";
+		columns = defaultColumns;
 
 		try {
 			Statement stmt = conn.createStatement();
@@ -384,6 +396,246 @@ public class JSimpleSQL {
 			e.printStackTrace();
 		}
 
+	}
+
+	protected static void fullStatement(String fullCode) {
+
+		try {
+			Statement fullSQLStatement = conn.createStatement();
+			fullSQLStatement.execute(fullCode);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			JSimpleSQLErrors.fullCodeError();
+		}
+
+	}
+
+	// ***Select Options ****************************************************
+	// **********************************************************************
+
+	protected static void selectData(String searchData) {
+		arrayData.add(searchData);
+	}
+
+	protected static void getData(String searchData) {
+		arrayData.add(searchData);
+	}
+
+	protected static void selectTable(String table) {
+		arrayTable.add(table);
+	}
+
+	protected static void selectFrom(String from) {
+		arrayTable.add(from);
+	}
+
+	protected static void selectWhere(String where) {
+		arrayWhere.add(where);
+	}
+
+	protected static void selectBy(String by) {
+		arrayBy.add(by);
+	}
+
+	protected static void selectWhere(String Prep, String from) {
+		if (!arrayFrom.isEmpty()) {
+			arrayPrep.add(Prep);
+		}
+
+		arrayFrom.add(from);
+	}
+
+	protected static void selectExecute() {
+		StringBuilder selectBuilder = new StringBuilder();
+		String comma = "";
+		selectBuilder.append("SELECT ");
+
+		for (String dataLoop : arrayData) {
+			selectBuilder.append(comma);
+			comma = ", ";
+			selectBuilder.append(dataLoop);
+		}
+		if (!arrayFrom.isEmpty()) {
+			selectBuilder.append(" FROM ");
+			comma = "";
+			for (String tableLoop : arrayFrom) {
+				selectBuilder.append(comma);
+				comma = ", ";
+				selectBuilder.append(tableLoop);
+			}
+		}
+
+		// Need TO Redo "Where"//
+
+	}
+
+	/*
+	 * JSimpleSQL.selectData("all"); = JSimpleSQL.selectData("all");
+	 * JSimpleSQL.selectTable("tablename"); JSimpleSQL.selectFrom("tablename");
+	 * JSimpleSQL.selectWhere("and", "all"); JSimpleSQL.selectWhere("all");
+	 * JSimpleSQL.selectBy("all"); JSimpleSQL.selectExecute();
+	 */
+	// int String double
+
+	// ***Add Values to Database***************************************************
+	// *********************************************************************
+	protected static void addValues(int data) {
+		String[] toData = { Integer.toString(data) };
+		sendData(toData, "Integer");
+	}
+
+	protected static void addValues(int[] data) {
+		String strArray[] = Arrays.stream(data).mapToObj(String::valueOf).toArray(String[]::new);
+		sendData(strArray, "Integer");
+	}
+
+	protected static void addValues(String data) {
+		String[] toData = { data };
+		sendData(toData, "String");
+	}
+
+	protected static void addValues(String[] data) {
+		sendData(data, "String");
+	}
+
+	protected static void addValues(double data) {
+		String[] toData = { Double.toString(data) };
+		sendData(toData, "Double");
+	}
+
+	protected static void addValues(double[] data) {
+		String strArray[] = Arrays.stream(data).mapToObj(String::valueOf).toArray(String[]::new);
+		sendData(strArray, "Double");
+	}
+
+	protected static void addValues(float data) {
+		String[] toData = { Float.toString(data) };
+		sendData(toData, "Float");
+	}
+
+	protected static void addValues(float[] data) {
+		String[] toData = new String[data.length];
+		for (int i = 0; i < data.length; i++) {
+			toData[i] = "" + toData[i];
+		}
+		sendData(toData, "Float");
+	}
+
+	protected static void addValues(long data) {
+		String[] toData = { Long.toString(data) };
+		sendData(toData, "Long");
+	}
+
+	protected static void addValues(long[] data) {
+		String strArray[] = Arrays.stream(data).mapToObj(String::valueOf).toArray(String[]::new);
+		sendData(strArray, "Long");
+	}
+
+	protected static void addValues(boolean data) {
+		String[] toData = { Boolean.toString(data) };
+		sendData(toData, "Boolean");
+	}
+
+	protected static void addValues(Boolean[] data) {
+		String[] toData = new String[data.length];
+		for (int i = 0; i < data.length; i++) {
+			toData[i] = "" + toData[i];
+		}
+		sendData(toData, "Boolean");
+	}
+
+	protected static void addValues(byte data) {
+		String[] toData = { Byte.toString(data) };
+		sendData(toData, "Byte");
+	}
+
+	protected static void addValues(byte[] data) {
+		String[] toData = new String[data.length];
+		for (int i = 0; i < data.length; i++) {
+			toData[i] = "" + toData[i];
+		}
+		sendData(toData, "Byte");
+	}
+
+	protected static void addValues(char data) {
+		String[] toData = { Character.toString(data) };
+		sendData(toData, "Char");
+	}
+
+	protected static void addValues(char[] data) {
+		String[] toData = new String[data.length];
+		for (int i = 0; i < data.length; i++) {
+			toData[i] = "" + toData[i];
+		}
+		sendData(toData, "Float");
+	}
+
+	protected static void addValues(short data) {
+		String[] toData = { Integer.toString(data) };
+		sendData(toData, "Short");
+	}
+
+	protected static void addValues(short[] data) {
+		String[] toData = new String[data.length];
+		for (int i = 0; i < data.length; i++) {
+			toData[i] = "" + toData[i];
+		}
+		sendData(toData, "Float");
+	}
+
+	protected static void sendData(String[] data, String variable) {
+		String comma = "";
+		arrayAddData = "(";
+		for (String getData : data) {
+			arrayAddData += comma;
+			if (variable == "String") {
+				arrayAddData += "\"" + getData + "\"";
+			}
+			comma = ", ";
+		}
+		arrayAddData = ")";
+
+	}
+
+	protected static void addToColumn(String columnName) {
+		String[] sendColumnName = { columnName };
+		sendAddToColumn(sendColumnName);
+	}
+
+	protected static void addToColumn(String[] columnName) {
+		sendAddToColumn(columnName);
+
+	}
+
+	protected static void sendAddToColumn(String[] columnName) {
+		String comma = "";
+		arrayAddColumn = "(";
+		for (String getData : columnName) {
+			arrayAddColumn += comma;
+			arrayAddColumn += getData;
+			comma = ", ";
+		}
+		arrayAddColumn = ")";
+	}
+
+	protected static void insertValues() {
+		insertAndAddValues();
+	}
+
+	protected static void insertData() {
+		insertAndAddValues();
+	}
+
+	protected static void insertAndAddValues() {
+		String Query = "INSERT INTO " + currentToTable + " " + arrayAddColumn + " VALUES " + arrayAddData + ";";
+
+		try {
+			PreparedStatement preparedStmt = conn.prepareStatement(Query);
+			preparedStmt.execute();
+		} catch (SQLException e) {
+			JSimpleSQLErrors.addValuesError();
+		}
 	}
 
 }
