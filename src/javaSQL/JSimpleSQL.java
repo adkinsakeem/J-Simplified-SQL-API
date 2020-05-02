@@ -8,7 +8,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
+
+import org.json.simple.JSONObject;
 
 public class JSimpleSQL {
 
@@ -31,6 +32,12 @@ public class JSimpleSQL {
 	static ArrayList<String> arrayWhere = new ArrayList<>();
 	static ArrayList<String> arrayBy = new ArrayList<>();
 	static ArrayList<String> arrayPrep = new ArrayList<>();
+	static ArrayList<String> arrayFromColumn = new ArrayList<>();
+	static ArrayList<String> arrayFromSymbol = new ArrayList<>();
+	static ArrayList<String> arrayFromVariable = new ArrayList<>();
+	static ArrayList<String> arrayFromOrderColumn = new ArrayList<>();
+	static ArrayList<String> arrayFromOrderSort = new ArrayList<>();
+
 	static String arrayAddData;
 	static String arrayAddColumn;
 
@@ -96,7 +103,6 @@ public class JSimpleSQL {
 		try {
 			Statement stmt = conn.createStatement();
 			String testString = "ALTER TABLE sqlapitest ADD Email varchar(255);";
-			System.out.println("Stmt: " + testString);
 			stmt.executeUpdate(testString);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -161,13 +167,9 @@ public class JSimpleSQL {
 
 	protected static void createtheTable(String tableName) {
 		try {
-			System.out.println("Test01");
 			Statement stmt = conn.createStatement();
-			System.out.println("Test02");
 			stmt.executeUpdate("CREATE TABLE " + tableName + " (FirstPlaceHolderColumnToDelete int);");
-			System.out.println("Test03");
 		} catch (SQLException e) {
-			e.printStackTrace();
 			JSimpleSQLErrors.createTableError();
 		}
 	}
@@ -237,10 +239,6 @@ public class JSimpleSQL {
 		columns[2] = cLength;
 	}
 
-	/*
-	 * protected static void columnCollation(String cColl) { columns[3] = cColl; }
-	 */
-
 	protected static void columnNull(String cNull) {
 		if (cNull.toUpperCase().equals("Yes".toUpperCase()) || cNull.toUpperCase().equals("Y".toUpperCase())) {
 			columns[4] = "NULL";
@@ -272,7 +270,6 @@ public class JSimpleSQL {
 	}
 
 	protected static void columnExtra(String cExtra) {
-		System.out.println("cExtra: " + cExtra);
 		if (cExtra.toUpperCase().equals("AUTOINCREMENT") || cExtra.toUpperCase().equals("YES")
 				|| cExtra.toUpperCase().equals("Y") || cExtra.toUpperCase().equals("AUTO_INCREMENT")) {
 			columns[7] = "AUTO_INCREMENT";
@@ -298,9 +295,6 @@ public class JSimpleSQL {
 	}
 
 	protected static void addTheColumn() {
-		System.out.println("\"Current: " + currentToTable);
-		System.out.println("Array: " + columns[0]);
-
 		String PrepString = "ALTER TABLE ";
 		PrepString = PrepString + currentToTable + " ADD ";
 		PrepString += columns[0] + " ";
@@ -328,8 +322,6 @@ public class JSimpleSQL {
 			PrepString += "(" + columns[2] + ")";
 		}
 
-		// PrepString += " COLLATE " + columns[3];
-
 		if (columns[4].toUpperCase().equals("NULL") || columns[4].toUpperCase().equals("Y".toUpperCase())
 				|| columns[4].toUpperCase().equals("YES".toUpperCase())) {
 			PrepString += " NULL";
@@ -354,7 +346,6 @@ public class JSimpleSQL {
 			PrepString += " COMMENT \"" + columns[6] + "\"";
 
 		}
-		System.out.println("Auto I: " + columns[7]);
 		if (columns[7].equals("AUTO_INCREMENT")) {
 			PrepString += " AUTO_INCREMENT, ADD PRIMARY KEY " + "(`" + columns[0] + "`)";
 		}
@@ -368,12 +359,10 @@ public class JSimpleSQL {
 
 		try {
 			Statement stmt = conn.createStatement();
-			System.out.println("Stmt: " + PrepString);
 			stmt.executeUpdate(PrepString);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			// Come here to use if statements to check various errors
+			JSimpleSQLErrors.addTheColumnError();
+
 		}
 
 		try {
@@ -392,8 +381,7 @@ public class JSimpleSQL {
 				}
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JSimpleSQLErrors.DropPlaceholderColumnError();
 		}
 
 	}
@@ -405,7 +393,6 @@ public class JSimpleSQL {
 			fullSQLStatement.execute(fullCode);
 
 		} catch (SQLException e) {
-			e.printStackTrace();
 			JSimpleSQLErrors.fullCodeError();
 		}
 
@@ -415,7 +402,11 @@ public class JSimpleSQL {
 	// **********************************************************************
 
 	protected static void selectData(String searchData) {
-		arrayData.add(searchData);
+		if (searchData.toUpperCase() == "ALL") {
+			arrayData.add("*");
+		} else {
+			arrayData.add(searchData);
+		}
 	}
 
 	protected static void getData(String searchData) {
@@ -427,7 +418,7 @@ public class JSimpleSQL {
 	}
 
 	protected static void selectFrom(String from) {
-		arrayTable.add(from);
+		arrayFrom.add(from);
 	}
 
 	protected static void selectWhere(String where) {
@@ -438,15 +429,203 @@ public class JSimpleSQL {
 		arrayBy.add(by);
 	}
 
-	protected static void selectWhere(String Prep, String from) {
-		if (!arrayFrom.isEmpty()) {
-			arrayPrep.add(Prep);
-		}
+	protected static void selectWhere(String Column, String Symbol, String Variable) {
+		arrayFromColumn.add(Column);
+		arrayFromVariable.add(Variable);
 
-		arrayFrom.add(from);
+		if (Symbol.equals("=") || Symbol.toUpperCase().equals("EQUALS") || Symbol.toUpperCase().equals("EQUAL")) {
+			arrayFromSymbol.add("=");
+		} else if (Symbol.equals(">") || Symbol.toUpperCase().equals("GREATER")
+				|| Symbol.toUpperCase().equals("GREATERTHAN") || Symbol.toUpperCase().equals("GREATER THAN")
+				|| Symbol.toUpperCase().equals("GREATER-THAN") || Symbol.toUpperCase().equals("GREATER_THAN")) {
+			arrayFromSymbol.add(">");
+		} else if (Symbol.equals("<") || Symbol.toUpperCase().equals("LESS") || Symbol.toUpperCase().equals("LESSTHAN")
+				|| Symbol.toUpperCase().equals("LESS THAN") || Symbol.toUpperCase().equals("LESS-THAN")
+				|| Symbol.toUpperCase().equals("LESS")) {
+			arrayFromSymbol.add("<");
+		} else if (Symbol.equals(">=") || Symbol.toUpperCase().equals("> =")
+				|| Symbol.toUpperCase().equals("GREATER THAN OR EQUAL")
+				|| Symbol.toUpperCase().equals("GREATERTHANOREQUAL")
+				|| Symbol.toUpperCase().equals("GREATER-THAN-OR-EQUAL")
+				|| Symbol.toUpperCase().equals("GREATER_THAN_OR_EQUAL")
+				|| Symbol.toUpperCase().equals("GREATERTHANEQUAL") || Symbol.toUpperCase().equals("GREATER_THAN_EQUAL")
+				|| Symbol.toUpperCase().equals("GREATER-THAN-EQUAL")
+				|| Symbol.toUpperCase().equals("GREATER THAN EQUAL")) {
+			arrayFromSymbol.add(">=");
+		} else if (Symbol.equals("<=") || Symbol.toUpperCase().equals("< =")
+				|| Symbol.toUpperCase().equals("LESS THAN OR EQUAL") || Symbol.toUpperCase().equals("LESSTHANOREQUAL")
+				|| Symbol.toUpperCase().equals("LESS-THAN-OR-EQUAL")
+				|| Symbol.toUpperCase().equals("LESS_THAN_OR_EQUAL") || Symbol.toUpperCase().equals("LESSTHANEQUAL")
+				|| Symbol.toUpperCase().equals("LESS_THAN_EQUAL") || Symbol.toUpperCase().equals("LESS-THAN-EQUAL")
+				|| Symbol.toUpperCase().equals("LESS THAN EQUAL")) {
+			arrayFromSymbol.add("<=");
+		} else if (Symbol.equals("<>") || Symbol.toUpperCase().equals("< >") || Symbol.toUpperCase().equals("!=")
+				|| Symbol.toUpperCase().equals("! =") || Symbol.toUpperCase().equals("NOT EQUAL")
+				|| Symbol.toUpperCase().equals("NOTEQUAL") || Symbol.toUpperCase().equals("NOT-EQUAL")
+				|| Symbol.toUpperCase().equals("NOT_EQUAL") || Symbol.toUpperCase().equals("NOT EQUAL TO")
+				|| Symbol.toUpperCase().equals("NOTEQUALTO") || Symbol.toUpperCase().equals("NOT-EQUAL-TO")
+				|| Symbol.toUpperCase().equals("NOT_EQUAL_TO")) {
+			arrayFromSymbol.add("<>");
+		} else if (Symbol.toUpperCase().equals("BETWEEN") || Symbol.toUpperCase().equals("BETWEEN")
+				|| Symbol.toUpperCase().equals("IN BETWEEN") || Symbol.toUpperCase().equals("INBETWEEN")
+				|| Symbol.toUpperCase().equals("IN-BETWEEN") || Symbol.toUpperCase().equals("IN_BETWEEN")) {
+			arrayFromSymbol.add("BETWEEN");
+		} else if (Symbol.toUpperCase().equals("LIKE") || Symbol.toUpperCase().equals("IS LIKE")
+				|| Symbol.toUpperCase().equals("ISLIKE") || Symbol.toUpperCase().equals("IS_LIKE")
+				|| Symbol.toUpperCase().equals("IS-LIKE")) {
+			arrayFromSymbol.add("LIKE");
+		} else if (Symbol.toUpperCase().equals("IN") || Symbol.toUpperCase().equals("WITHIN")) {
+			arrayFromSymbol.add("IN");
+		}
 	}
 
-	protected static void selectExecute() {
+	protected static void selectOrderBy(String Column, String Sort) {
+		arrayFromOrderColumn.add(Column);
+		OrderBySelect(Sort);
+	}
+
+	protected static void selectOrder(String Column, String Sort) {
+		arrayFromOrderColumn.add(Column);
+		OrderBySelect(Sort);
+	}
+
+	protected static void OrderBySelect(String Sort) {
+		if (Sort.toUpperCase() == "DESC" || Sort.toUpperCase() == "DEC" || Sort.toUpperCase() == "DES"
+				|| Sort.toUpperCase() == "DESCEND" || Sort.toUpperCase() == "DESCENDING"
+				|| Sort.toUpperCase() == "DESCENDING ORDER" || Sort.toUpperCase() == "DESCENDINGORDER"
+				|| Sort.toUpperCase() == "DESCENDING-ORDER" || Sort.toUpperCase() == "DESCENDING_ORDER"
+				|| Sort.toUpperCase() == "DESC ORDER" || Sort.toUpperCase() == "DESCORDER"
+				|| Sort.toUpperCase() == "DESC-ORDER" || Sort.toUpperCase() == "DESC_ORDER") {
+			arrayFromOrderSort.add("DESC");
+		} else if (Sort.toUpperCase() == "ASC" || Sort.toUpperCase() == "ASCEND" || Sort.toUpperCase() == "ASCENDING"
+				|| Sort.toUpperCase() == "ASCENDING ORDER" || Sort.toUpperCase() == "ASCENDINGORDER"
+				|| Sort.toUpperCase() == "ASCENDING-ORDER" || Sort.toUpperCase() == "ASCENDING_ORDER"
+				|| Sort.toUpperCase() == "ASC ORDER" || Sort.toUpperCase() == "ASCORDER"
+				|| Sort.toUpperCase() == "ASC-ORDER" || Sort.toUpperCase() == "ASC_ORDER") {
+			arrayFromOrderSort.add("ASC");
+		}
+
+	}
+
+	protected static void selectOr() {
+		arrayFromColumn.add(null);
+		arrayFromSymbol.add(null);
+		arrayFromVariable.add(null);
+	}
+
+	protected static ResultSet selectRSExecute() {
+		return (getExecuteInfo());
+	}
+
+	protected static JSONObject selectJSONExecute() {
+		return getJson();
+	}
+
+	protected static String selectExecute() {
+		return getJson().toString();
+	}
+
+	protected static String selectStringExecute() {
+		return getJson().toString();
+	}
+
+	@SuppressWarnings("unchecked")
+	protected static JSONObject getJson() {
+		JSONObject JSONSQLObj = new JSONObject();
+		JSONObject JSONSQLInnerObj = new JSONObject();
+		ResultSet rs = getExecuteInfo();
+		ArrayList<String> SQLColumns = new ArrayList<>();
+		ArrayList<Integer> SQLColumnType = new ArrayList<>();
+		try {
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNum = rsmd.getColumnCount();
+			for (int x = 1; x <= columnsNum; x++) {
+				SQLColumns.add(rsmd.getColumnName(x));
+				SQLColumnType.add(rsmd.getColumnType(x));
+			}
+			int count = 0;
+			while (rs.next()) {
+				for (int x = 0; x < columnsNum; x++) {
+					switch (SQLColumnType.get(x)) {
+					case -7:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getBytes(SQLColumns.get(x)));
+						break;
+					case -6:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getInt(SQLColumns.get(x)));
+						break;
+					case -5:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getInt(SQLColumns.get(x)));
+						break;
+					case -4:
+						// LONGVERBINARY JSONSQLInnerObj.put(SQLColumns.get(x),
+						// rs.getInt(SQLColumns.get(x)));
+						break;
+					case -3:
+						// VARBINARY JSONSQLInnerObj.put(SQLColumns.get(x),
+						// rs.getInt(SQLColumns.get(x)));
+						break;
+					case -2:
+						// BINARY JSONSQLInnerObj.put(SQLColumns.get(x), rs.getInt(SQLColumns.get(x)));
+						break;
+					case -1:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getString(SQLColumns.get(x)));
+						break;
+					case -0:
+						JSONSQLInnerObj.put(SQLColumns.get(x), null);
+						break;
+					case 1:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getCharacterStream(SQLColumns.get(x)));
+						break;
+					case 2:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getInt(SQLColumns.get(x)));
+						break;
+					case 3:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getFloat(SQLColumns.get(x)));
+						break;
+					case 4:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getInt(SQLColumns.get(x)));
+						break;
+					case 5:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getInt(SQLColumns.get(x)));
+						break;
+					case 6:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getFloat(SQLColumns.get(x)));
+						break;
+					case 7:
+						// JSONSQLInnerObj.put(SQLColumns.get(x), rs.getInt(SQLColumns.get(x)));
+						break;
+					case 8:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getDouble(SQLColumns.get(x)));
+						break;
+					case 12:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getString(SQLColumns.get(x)));
+						break;
+					case 91:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getDate(SQLColumns.get(x)));
+						break;
+					case 92:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getTime(SQLColumns.get(x)));
+						break;
+					case 93:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getTimestamp(SQLColumns.get(x)));
+						break;
+					default:
+						JSONSQLInnerObj.put(SQLColumns.get(x), rs.getString(SQLColumns.get(x)));
+						break;
+					}
+				}
+
+				JSONSQLObj.put(count, JSONSQLInnerObj);
+				count++;
+			}
+		} catch (SQLException e) {
+			JSimpleSQLErrors.selectStringError();
+		}
+		return JSONSQLObj;
+	}
+
+	protected static ResultSet getExecuteInfo() {
+		ResultSet rs = null;
 		StringBuilder selectBuilder = new StringBuilder();
 		String comma = "";
 		selectBuilder.append("SELECT ");
@@ -466,157 +645,171 @@ public class JSimpleSQL {
 			}
 		}
 
-		// Need TO Redo "Where"//
+		if (!arrayFromColumn.isEmpty()) {
+			String andVar = "";
+			selectBuilder.append(" WHERE (");
+
+			for (int x = 0; x < arrayFromColumn.size(); x++) {
+				if (arrayFromColumn.get(x) == null && arrayFromSymbol.get(x) == null
+						&& arrayFromVariable.get(x) == null) {
+					selectBuilder.append(") OR (");
+					andVar = "";
+				} else {
+					selectBuilder.append(andVar);
+					selectBuilder.append(arrayFromColumn.get(x) + " " + arrayFromSymbol.get(x) + " '"
+							+ arrayFromVariable.get(x) + "'");
+					andVar = " AND ";
+				}
+			}
+			selectBuilder.append(")");
+		}
+
+		if (!arrayFromOrderColumn.isEmpty()) {
+			selectBuilder.append(" ORDER BY ");
+			comma = "";
+			for (int x = 0; x < arrayFromOrderColumn.size(); x++) {
+				selectBuilder.append(comma);
+				selectBuilder.append(arrayFromOrderColumn.get(x) + " " + arrayFromOrderSort.get(x));
+				comma = ", ";
+			}
+		}
+		selectBuilder.append(";");
+		clearSelectArrays();
+
+		try {
+			Statement stmt = conn.createStatement();
+			rs = stmt.executeQuery(selectBuilder.toString());
+
+		} catch (SQLException e) {
+			JSimpleSQLErrors.ResultSetError();
+		}
+		return rs;
 
 	}
 
-	/*
-	 * JSimpleSQL.selectData("all"); = JSimpleSQL.selectData("all");
-	 * JSimpleSQL.selectTable("tablename"); JSimpleSQL.selectFrom("tablename");
-	 * JSimpleSQL.selectWhere("and", "all"); JSimpleSQL.selectWhere("all");
-	 * JSimpleSQL.selectBy("all"); JSimpleSQL.selectExecute();
-	 */
-	// int String double
+	protected static void clearSelectArrays() {
+		arrayData.clear();
+		arrayTable.clear();
+		arrayFrom.clear();
+		arrayWhere.clear();
+		arrayBy.clear();
+		arrayFromColumn.clear();
+		arrayFromVariable.clear();
+		arrayFromSymbol.clear();
+		arrayFromOrderColumn.clear();
+		arrayFromOrderSort.clear();
+
+	}
 
 	// ***Add Values to Database***************************************************
 	// *********************************************************************
-	protected static void addValues(int data) {
-		String[] toData = { Integer.toString(data) };
+	protected static void addValues(int... data) {
+		ArrayList<String> toData = new ArrayList<>();
+		for (int tempData : data) {
+			toData.add(Integer.toString(tempData));
+		}
 		sendData(toData, "Integer");
 	}
 
-	protected static void addValues(int[] data) {
-		String strArray[] = Arrays.stream(data).mapToObj(String::valueOf).toArray(String[]::new);
-		sendData(strArray, "Integer");
-	}
+	protected static void addValues(String... data) {
+		ArrayList<String> toData = new ArrayList<>();
+		for (String tempData : data) {
+			toData.add(tempData);
+		}
 
-	protected static void addValues(String data) {
-		String[] toData = { data };
 		sendData(toData, "String");
 	}
 
-	protected static void addValues(String[] data) {
-		sendData(data, "String");
-	}
-
-	protected static void addValues(double data) {
-		String[] toData = { Double.toString(data) };
+	protected static void addValues(double... data) {
+		ArrayList<String> toData = new ArrayList<>();
+		for (double tempData : data) {
+			toData.add(Double.toString(tempData));
+		}
 		sendData(toData, "Double");
 	}
 
-	protected static void addValues(double[] data) {
-		String strArray[] = Arrays.stream(data).mapToObj(String::valueOf).toArray(String[]::new);
-		sendData(strArray, "Double");
-	}
-
-	protected static void addValues(float data) {
-		String[] toData = { Float.toString(data) };
-		sendData(toData, "Float");
-	}
-
-	protected static void addValues(float[] data) {
-		String[] toData = new String[data.length];
-		for (int i = 0; i < data.length; i++) {
-			toData[i] = "" + toData[i];
+	protected static void addValues(float... data) {
+		ArrayList<String> toData = new ArrayList<>();
+		for (float tempData : data) {
+			toData.add(Float.toString(tempData));
 		}
 		sendData(toData, "Float");
 	}
 
-	protected static void addValues(long data) {
-		String[] toData = { Long.toString(data) };
+	protected static void addValues(Long... data) {
+		ArrayList<String> toData = new ArrayList<>();
+		for (long tempData : data) {
+			toData.add(Long.toString(tempData));
+		}
 		sendData(toData, "Long");
 	}
 
-	protected static void addValues(long[] data) {
-		String strArray[] = Arrays.stream(data).mapToObj(String::valueOf).toArray(String[]::new);
-		sendData(strArray, "Long");
-	}
-
-	protected static void addValues(boolean data) {
-		String[] toData = { Boolean.toString(data) };
-		sendData(toData, "Boolean");
-	}
-
-	protected static void addValues(Boolean[] data) {
-		String[] toData = new String[data.length];
-		for (int i = 0; i < data.length; i++) {
-			toData[i] = "" + toData[i];
+	protected static void addValues(boolean... data) {
+		ArrayList<String> toData = new ArrayList<>();
+		for (boolean tempData : data) {
+			toData.add(Boolean.toString(tempData));
 		}
 		sendData(toData, "Boolean");
 	}
 
-	protected static void addValues(byte data) {
-		String[] toData = { Byte.toString(data) };
-		sendData(toData, "Byte");
-	}
-
-	protected static void addValues(byte[] data) {
-		String[] toData = new String[data.length];
-		for (int i = 0; i < data.length; i++) {
-			toData[i] = "" + toData[i];
+	protected static void addValues(byte... data) {
+		ArrayList<String> toData = new ArrayList<>();
+		for (byte tempData : data) {
+			toData.add(Byte.toString(tempData));
 		}
 		sendData(toData, "Byte");
 	}
 
-	protected static void addValues(char data) {
-		String[] toData = { Character.toString(data) };
+	protected static void addValues(char... data) {
+		ArrayList<String> toData = new ArrayList<>();
+		for (char tempData : data) {
+			toData.add(Character.toString(tempData));
+		}
 		sendData(toData, "Char");
 	}
 
-	protected static void addValues(char[] data) {
-		String[] toData = new String[data.length];
-		for (int i = 0; i < data.length; i++) {
-			toData[i] = "" + toData[i];
+	protected static void addValues(short... data) {
+		ArrayList<String> toData = new ArrayList<>();
+		for (short tempData : data) {
+			toData.add(Short.toString(tempData));
 		}
-		sendData(toData, "Float");
-	}
-
-	protected static void addValues(short data) {
-		String[] toData = { Integer.toString(data) };
 		sendData(toData, "Short");
 	}
 
-	protected static void addValues(short[] data) {
-		String[] toData = new String[data.length];
-		for (int i = 0; i < data.length; i++) {
-			toData[i] = "" + toData[i];
-		}
-		sendData(toData, "Float");
-	}
-
-	protected static void sendData(String[] data, String variable) {
+	protected static void sendData(ArrayList<String> data, String variable) {
 		String comma = "";
 		arrayAddData = "(";
 		for (String getData : data) {
 			arrayAddData += comma;
 			if (variable == "String") {
 				arrayAddData += "\"" + getData + "\"";
+			} else {
+				arrayAddData += getData;
 			}
-			comma = ", ";
+			comma += ", ";
 		}
-		arrayAddData = ")";
+		arrayAddData += ")";
 
 	}
 
-	protected static void addToColumn(String columnName) {
-		String[] sendColumnName = { columnName };
+	protected static void addToColumns(String... columnName) {
+		ArrayList<String> sendColumnName = new ArrayList<>();
+		for (String tempData : columnName) {
+			sendColumnName.add(tempData);
+		}
+
 		sendAddToColumn(sendColumnName);
 	}
 
-	protected static void addToColumn(String[] columnName) {
-		sendAddToColumn(columnName);
-
-	}
-
-	protected static void sendAddToColumn(String[] columnName) {
+	protected static void sendAddToColumn(ArrayList<String> columnName) {
 		String comma = "";
 		arrayAddColumn = "(";
 		for (String getData : columnName) {
 			arrayAddColumn += comma;
 			arrayAddColumn += getData;
-			comma = ", ";
+			comma += ", ";
 		}
-		arrayAddColumn = ")";
+		arrayAddColumn += ")";
 	}
 
 	protected static void insertValues() {
@@ -624,6 +817,10 @@ public class JSimpleSQL {
 	}
 
 	protected static void insertData() {
+		insertAndAddValues();
+	}
+
+	protected static void insert() {
 		insertAndAddValues();
 	}
 

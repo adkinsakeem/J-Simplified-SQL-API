@@ -11,7 +11,7 @@ public class TestSQLCall {
 		JSimpleSQL.open();
 
 		// JSimpleSQL.createDB("sqlAPITest2");
-		// JSimpleSQL.useDB("sqlapitest");
+		JSimpleSQL.useDB("sqlapitest");
 		// JSimpleSQL.createTable("SQLTable01");
 		// JSimpleSQL.testFunction();
 		// JSimpleSQL.columnToTable("SQLTable01");
@@ -21,14 +21,26 @@ public class TestSQLCall {
 		// JSimpleSQL.columnComment("This is a comment for the Auto Increment");
 		// JSimpleSQL.columnExtra("Auto_Increment");
 		// JSimpleSQL.addValues();
-		// JSimpleSQL.addToColumn();
-		JSimpleSQL.insertData();
-		JSimpleSQL.insertValues();
+		// JSimpleSQL.insertValues();
+		JSimpleSQL.columnToTable("SQLTable01");
+		// JSimpleSQL.addValues("Akeem");
+		// JSimpleSQL.addToColumns("Name");
+		// JSimpleSQL.insert();
+		JSimpleSQL.selectData("*");
+		JSimpleSQL.selectFrom("SQLTable01");
+		JSimpleSQL.selectWhere("Name", "Equals", "Akeem");
+		JSimpleSQL.selectOrderBy("Name", "ASC");
+		JSimpleSQL.selectOr();
+		JSimpleSQL.selectWhere("Count1", "Equals", "20");
+		// ResultSet rs = JSimpleSQL.selectRSExecute();
+		// System.out.println(JSimpleSQL.selectExecute());
+
+		// System.out.println("Got It" + JSimpleSQL.selectExecute());
 
 		// JSimpleSQL.addData(); either one value or array of values
-		// JSimpleSQL.fullStatement("SELECT * from SQLTable01;");
+		JSimpleSQL.fullStatement("INSERT INTO sqltable01 (Name, Count1) VALUES (\"Dave\", 231);");
 
-		JSimpleSQL.createColumn();
+		// JSimpleSQL.createColumn();
 
 	}
 

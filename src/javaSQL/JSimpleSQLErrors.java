@@ -45,4 +45,25 @@ public class JSimpleSQLErrors {
 				"There is an error with the inserted values. Make sure the values are the correct variable type. Also, make sure the number of values entered equal the number of columns accepting values.");
 	}
 
+	protected static void selectStringError() {
+		System.out.println(
+				"There is an error with the data you entered. Check your variables, the variable types, and the column names and make sure they are correct.");
+	}
+
+	protected static void addTheColumnError() {
+		System.out.println(
+				"There was an error with the column you are trying to add. Make sure you are entering the correct data in your query.");
+	}
+
+	protected static void DropPlaceholderColumnError() {
+		System.out.println("An error occurred when attempting to drop the temporary (place holder) column.");
+
+	}
+
+	protected static void ResultSetError() {
+		System.out.println(
+				"An error with retrieving the data from the database. Check the information entered in your query.");
+
+	}
+
 }
