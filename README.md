@@ -48,7 +48,7 @@ JSimpleSQL.addToColumns("Name of Column"); = Enter the column you want to add a 
 JSimpleSQL.addValues("Name of Value that we are Adding"); = Enter value that you want to add to the table.
 
 ### Select Data from Database
-JSimpleSQL.useDB("Which Database are we Using"); = Enter the name of the datababse you are retrieving data from. 
+JSimpleSQL.useDB("Which Database are we Using"); = Enter the name of the database you are retrieving data from. 
 JSimpleSQL.selectData("Data We are Selecting"); = Enter the data we are selecting from the table.
 JSimpleSQL.selectFrom("Table we are Getting Data From"); = Enter the table you are selecting the data from. 
 JSimpleSQL.selectWhere(Column Name, "Operator(=, >)", "Variable Name"); = Enter the column name that you want to use to compare, the comparison operator that you want to use, and the variable name you want to compare it to. (Ex. JSimpleSQL.selectWhere("Name", "=", "JohnDoe").
@@ -57,7 +57,7 @@ JSimpleSQL.selectOr(); = Enter if you want to an "OR" comparison between two set
 JSimpleSQL.selectRSExecute(); = Use to send the requested query and have it return in "ResultSet" format.
 JSimpleSQL.selectJSONExecute(); = Use to send the requested query and have it return in "JSON" format.
 JSimpleSQL.selectExecute(); = Use to send the requested query and have it return in "String" format.
-JSimpleSQL.selectStringExecute(); = Same as the "JSimpleSQL.selectExecute();" function.Use to send the requested query and have it return in "String" format.
+JSimpleSQL.selectStringExecute(); = Same as the "JSimpleSQL.selectExecute();" function. Use to send the requested query and have it return in "String" format.
 JSimpleSQL.fullStatement("Enter SQL code."); Use to directly enter any SQL code directly. 
 
 
