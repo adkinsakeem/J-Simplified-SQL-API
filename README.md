@@ -5,7 +5,7 @@ This combines with the mysql-connector to give the user an easier way to communi
 These files need to be compiled and exported to a jar file. 
 
 # Inclusion Path
-### src.javaSQL;
+### import javaSQL.JSimpleSQL;
 
 # Installation Instructions
 ## These directions are made using Eclipse. Directions may vary depending on the Integrated Development Editor used.

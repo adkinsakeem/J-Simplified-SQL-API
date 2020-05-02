@@ -4,5 +4,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.8.0_161/custom-libraries/mysql-connector-java-8.0.18.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.8.0_161/custom-libraries/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.8.0_161/custom-libraries/JSimpleSQL.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
