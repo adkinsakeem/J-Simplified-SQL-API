@@ -26,14 +26,14 @@ public class TestSQLCall {
 		// JSimpleSQL.addValues("Akeem");
 		// JSimpleSQL.addToColumns("Name");
 		// JSimpleSQL.insert();
-		JSimpleSQL.selectData("*");
+		JSimpleSQL.selectData("Name, Count");
 		JSimpleSQL.selectFrom("SQLTable01");
 		JSimpleSQL.selectWhere("Name", "Equals", "Akeem");
 		JSimpleSQL.selectOrderBy("Name", "ASC");
 		JSimpleSQL.selectOr();
 		JSimpleSQL.selectWhere("Count1", "Equals", "20");
 		// ResultSet rs = JSimpleSQL.selectRSExecute();
-		// System.out.println(JSimpleSQL.selectExecute());
+		System.out.println(JSimpleSQL.selectExecute());
 
 		// System.out.println("Got It" + JSimpleSQL.selectExecute());
 
